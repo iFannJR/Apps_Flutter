@@ -12,6 +12,55 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
   bool _rememberMe = true;
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  void _showLoginAlert(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the alert dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login Successful'),
+          content: const Text('You have successfully logged in!'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Navigate to DashboardPage when OK is pressed
+                Navigator.of(context).pop(); // Close the alert dialog
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardPage(),
+                  ),
+                );
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +92,7 @@ class _LoginPageState extends State<LoginPage> {
               const Text("Email address"),
               const SizedBox(height: 8),
               TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   hintText: 'Your email',
                   border: OutlineInputBorder(
@@ -56,6 +106,7 @@ class _LoginPageState extends State<LoginPage> {
               const Text("Password"),
               const SizedBox(height: 8),
               TextField(
+                controller: _passwordController,
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   hintText: 'Password',
@@ -110,12 +161,17 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DashboardPage(),
-                      ),
-                    );
+                    String email = _emailController.text;
+                    String password = _passwordController.text;
+
+                    // Validasi input
+                    if (email.isEmpty || password.isEmpty) {
+                      // Jika email atau password kosong
+                      _showLoginAlert('Please enter both email and password.');
+                    } else {
+                      // Jika email dan password sudah diisi, tampilkan alert berhasil login
+                      _showSuccessAlert();
+                    }
                   },
                   child: const Text(
                     'Log in',
