@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'riwayat_page.dart';
+
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -16,11 +18,11 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
-  final List<Widget> _pages = [
-    Center(child: Text('Riwayat', style: TextStyle(fontSize: 24))),
-    Center(child: Text('Klasifikasi', style: TextStyle(fontSize: 24))),
-    _DashboardHome(),
-  ];
+final List<Widget> _pages = [
+  const RiwayatPage(),
+  Center(child: Text('Klasifikasi', style: TextStyle(fontSize: 24))),
+  _DashboardHome(),
+];
 
   @override
   Widget build(BuildContext context) {

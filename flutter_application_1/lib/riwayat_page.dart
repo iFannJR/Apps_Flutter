@@ -1,81 +1,75 @@
 import 'package:flutter/material.dart';
 
-class RiwayatPage extends StatelessWidget {
+class RiwayatPage extends StatefulWidget {
   const RiwayatPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    "Riwayat",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Icon(Icons.history, size: 28)
-                ],
-              ),
-            ),
+  State<RiwayatPage> createState() => _RiwayatPageState();
+}
 
-            // Animated List
+class _RiwayatPageState extends State<RiwayatPage> {
+  final List<Map<String, String>> dataPasien = [
+    {'nama': 'Rudi', 'status': 'Diabetes'},
+    {'nama': 'Amba singh', 'status': 'Tidak'},
+    {'nama': 'Cik dayat', 'status': 'Diabetes'},
+    {'nama': 'Wanto', 'status': 'Tidak'},
+    {'nama': 'Tono', 'status': 'Diabetes'},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Riwayat Pemeriksaan",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return AnimatedContainer(
-                    duration: Duration(milliseconds: 500 + (index * 100)),
-                    curve: Curves.easeInOut,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.15),
-                          blurRadius: 10,
-                          offset: Offset(0, 4),
-                        )
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: const [
-                            Icon(Icons.monetization_on_rounded,
-                                size: 28, color: Colors.black87),
-                            SizedBox(width: 12),
-                            Text(
-                              "Pembayaran Listrik",
-                              style: TextStyle(fontSize: 16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columnSpacing: 24,
+                    columns: const [
+                      DataColumn(
+                        label: Text('Nama Pasien',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      DataColumn(
+                        label: Text('Status Diabetes',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                    rows: dataPasien.map((pasien) {
+                      return DataRow(cells: [
+                        DataCell(Text(pasien['nama']!)),
+                        DataCell(
+                          Text(
+                            pasien['status'] == 'Diabetes'
+                                ? 'Diabetes'
+                                : 'Tidak',
+                            style: TextStyle(
+                              color: pasien['status'] == 'Diabetes'
+                                  ? Colors.red
+                                  : Colors.green,
+                              fontWeight: FontWeight.w600,
                             ),
-                          ],
-                        ),
-                        const Text(
-                          "-Rp250.000",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.redAccent,
-                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
-                    ),
-                  );
-                },
+                      ]);
+                    }).toList(),
+                  ),
+                ),
               ),
             ),
           ],
@@ -84,4 +78,3 @@ class RiwayatPage extends StatelessWidget {
     );
   }
 }
-
