@@ -41,12 +41,12 @@ class OnboardingPage extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               const Text(
-                'Explore the app',
+                'Diabayes Apps',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               const Text(
-                'Now your finances are in one place\nand always under control',
+                'Pendamping cerdas Anda untuk manajemen diabetes \n yang lebih praktis. \nMasuk atau buat akun untuk merasakan kemudahannya.',
                 style: TextStyle(fontSize: 16, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),

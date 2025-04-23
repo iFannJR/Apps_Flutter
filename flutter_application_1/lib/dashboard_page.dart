@@ -18,7 +18,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   final List<Widget> _pages = [
     Center(child: Text('Riwayat', style: TextStyle(fontSize: 24))),
-    Center(child: Text('Analisis', style: TextStyle(fontSize: 24))),
+    Center(child: Text('Klasifikasi', style: TextStyle(fontSize: 24))),
     _DashboardHome(),
   ];
 
@@ -55,7 +55,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart),
-              label: 'Analisis',
+              label: 'Klasifikasi',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_customize),
@@ -120,7 +120,7 @@ class _DashboardHome extends StatelessWidget {
                     ),
                     child: const Center(
                       child: Text(
-                        'Analisis',
+                        'Klasifikasi',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),

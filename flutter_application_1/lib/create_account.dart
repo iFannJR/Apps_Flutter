@@ -12,6 +12,43 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
+  void _showAlert(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent,
+      ),
+    );
+  }
+
+  void _createAccount() {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      _showAlert("Silakan isi semua kolom yang tersedia.");
+      return;
+    }
+
+    if (password != confirmPassword) {
+      _showAlert("Passwords yang anda tulis berbeda. Mohon di cek lagi.");
+      return;
+    }
+
+    // Navigasi ke halaman onboarding
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const OnboardingPage(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,15 +61,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 24),
-
-                // Ilustrasi
                 Image.asset(
                   'data/gambar1.png',
                   height: 200,
                 ),
                 const SizedBox(height: 32),
-
-                // Title
                 const Text(
                   'Create account',
                   style: TextStyle(
@@ -44,6 +77,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
                 // Email
                 TextField(
+                  controller: _emailController,
                   decoration: InputDecoration(
                     hintText: 'Email address',
                     border: OutlineInputBorder(
@@ -57,6 +91,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
                 // Password
                 TextField(
+                  controller: _passwordController,
                   obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
                     hintText: 'Password',
@@ -83,6 +118,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
                 // Confirm Password
                 TextField(
+                  controller: _confirmPasswordController,
                   obscureText: !_isConfirmPasswordVisible,
                   decoration: InputDecoration(
                     hintText: 'Confirm password',
@@ -119,15 +155,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () {
-                      // Navigasi ke halaman onboarding
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const OnboardingPage(),
-                        ),
-                      );
-                    },
+                    onPressed: _createAccount,
                     child: const Text(
                       'Create account',
                       style: TextStyle(
@@ -139,19 +167,18 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Terms and Conditions
+// no text
                 const Text.rich(
                   TextSpan(
                     text:
-                        'By creating an account or signing you agree to our ',
+                        '',
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.black54,
                     ),
                     children: [
                       TextSpan(
-                        text: 'Terms and Conditions',
+                        text: '',
                         style: TextStyle(
                           decoration: TextDecoration.underline,
                           fontWeight: FontWeight.w600,

@@ -12,54 +12,38 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
   bool _rememberMe = true;
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
 
-  void _showLoginAlert(String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Login'),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the alert dialog
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void _showSnackBar(String message, {bool success = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: success ? Colors.green : Colors.redAccent,
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 
-  void _showSuccessAlert() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Login Successful'),
-          content: const Text('You have successfully logged in!'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                // Navigate to DashboardPage when OK is pressed
-                Navigator.of(context).pop(); // Close the alert dialog
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DashboardPage(),
-                  ),
-                );
-              },
-              child: const Text('OK'),
-            ),
-          ],
+  void _login() {
+    String email = _emailController.text.trim();
+    String password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      _showSnackBar('Tolong isi Password dan Email.');
+    } else {
+      // Menampilkan snackbar sukses, lalu navigasi setelah delay
+      _showSnackBar('Login Berhasil!', success: true);
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DashboardPage(),
+          ),
         );
-      },
-    );
+      });
+    }
   }
 
   @override
@@ -131,22 +115,18 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 12),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _rememberMe,
-                        onChanged: (value) {
-                          setState(() {
-                            _rememberMe = value ?? false;
-                          });
-                        },
-                        activeColor: Colors.black,
-                      ),
-                      const Text('Remember me'),
-                    ],
+                  Checkbox(
+                    value: _rememberMe,
+                    onChanged: (value) {
+                      setState(() {
+                        _rememberMe = value ?? false;
+                      });
+                    },
+                    activeColor: Colors.black,
                   ),
+                  const Text('Remember me'),
                 ],
               ),
               const SizedBox(height: 16),
@@ -160,19 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: () {
-                    String email = _emailController.text;
-                    String password = _passwordController.text;
-
-                    // Validasi input
-                    if (email.isEmpty || password.isEmpty) {
-                      // Jika email atau password kosong
-                      _showLoginAlert('Please enter both email and password.');
-                    } else {
-                      // Jika email dan password sudah diisi, tampilkan alert berhasil login
-                      _showSuccessAlert();
-                    }
-                  },
+                  onPressed: _login,
                   child: const Text(
                     'Log in',
                     style: TextStyle(
