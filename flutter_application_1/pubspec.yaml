@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  awesome_snackbar_content: ^0.1.5
+  fl_chart: ^0.71.0
 
 dev_dependencies:
   flutter_test:
