@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'riwayat_page.dart';
-
+import 'klasifikasi_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -20,9 +20,10 @@ class _DashboardPageState extends State<DashboardPage> {
 
 final List<Widget> _pages = [
   const RiwayatPage(),
-  Center(child: Text('Klasifikasi', style: TextStyle(fontSize: 24))),
+  const KlasifikasiPage(), // ← ganti dari Center() ke widget yang asli
   _DashboardHome(),
 ];
+
 
   @override
   Widget build(BuildContext context) {
