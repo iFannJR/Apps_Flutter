@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'riwayat_page.dart';
 import 'klasifikasi_page.dart';
 
@@ -9,8 +10,13 @@ class DashboardPage extends StatefulWidget {
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardPageState extends State<DashboardPage>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 2; // Default ke dashboard (di paling kanan)
+
+  // Controller dan query pencarian
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   void _onItemTapped(int index) {
     setState(() {
@@ -18,12 +24,27 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
-final List<Widget> _pages = [
-  const RiwayatPage(),
-  const KlasifikasiPage(), // ← ganti dari Center() ke widget yang asli
-  _DashboardHome(),
-];
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+  }
 
+  List<Widget> get _pages => [
+        const RiwayatPage(),
+        const KlasifikasiPage(),
+        _DashboardHome(
+          searchController: _searchController,
+          searchQuery: _searchQuery,
+          onSearchChanged: _onSearchChanged,
+        ),
+      ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,76 +93,118 @@ final List<Widget> _pages = [
 }
 
 class _DashboardHome extends StatelessWidget {
+  final TextEditingController searchController;
+  final String searchQuery;
+  final ValueChanged<String> onSearchChanged;
+
+  const _DashboardHome({
+    required this.searchController,
+    required this.searchQuery,
+    required this.onSearchChanged,
+  });
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Dashboard",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Row(
+      child: Column(
+        children: [
+          Container(
+            color: Colors.black,
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Container(
-                    height: 120,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.purple.shade100, Colors.purple.shade200],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Riwayat',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                const Text(
+                  "Dashboard",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Container(
-                    height: 120,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue.shade100, Colors.blue.shade200],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[900],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.search, color: Colors.white70),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextField(
+                                controller: searchController,
+                                onChanged: onSearchChanged,
+                                style: const TextStyle(color: Colors.white54),
+                                decoration: const InputDecoration.collapsed(
+                                  hintText: "Search",
+                                  hintStyle: TextStyle(color: Colors.white54),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Center(
-                      child: Text(
-                        'Klasifikasi',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                    const SizedBox(width: 12),
+                    Container(
+                      height: 48,
+                      width: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.brown,
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      child: const Icon(Icons.tune, color: Colors.white),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                if (searchQuery.isEmpty)
+                  Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: BarChart(
+                      BarChartData(
+                        borderData: FlBorderData(show: false),
+                        titlesData: FlTitlesData(show: false),
+                        barGroups: [
+                          for (int i = 0; i < 5; i++)
+                            BarChartGroupData(
+                              x: i,
+                              barRods: [
+                                BarChartRodData(
+                                    toY: (i + 1) * 2.0,
+                                    color: Colors.blueAccent,
+                                    width: 16),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      "Hasil pencarian untuk: $searchQuery",
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
                     ),
                   ),
-                ),
               ],
             ),
-            const SizedBox(height: 32),
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(child: Text("Konten lainnya di sini")),
-            ),
-          ],
-        ),
+          ),
+          Expanded(child: Container(color: Colors.white)),
+        ],
       ),
     );
   }
