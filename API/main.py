@@ -5,26 +5,35 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-app.config["MONGO_URI"] = "mongodb://localhost:27017/"
+# Konfigurasi koneksi MongoDB
+app.config["MONGO_URI"] = "mongodb://localhost:27017/test"  # db 'test'
 mongo = PyMongo(app)
-users = mongo.db.users
+users = mongo.db.test  # collection 'test' di db 'test'
 
+# Registrasi pengguna
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    if users.find_one({'email': data['email']}):
+    email = data.get("email")
+    password = data.get("password")
+
+    if users.find_one({'email': email}):
         return jsonify({'error': 'Email sudah digunakan'}), 400
-    users.insert_one({'email': data['email'], 'password': data['password']})
+
+    users.insert_one({'email': email, 'password': password})
     return jsonify({'message': 'Registrasi berhasil'}), 201
 
+# Login pengguna
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user = users.find_one({'email': data['email'], 'password': data['password']})
+    email = data.get("email")
+    password = data.get("password")
+
+    user = users.find_one({'email': email, 'password': password})
     if user:
         return jsonify({'message': 'Login berhasil'}), 200
     return jsonify({'error': 'Login gagal'}), 401
 
 if __name__ == '__main__':
     app.run(debug=True)
-
