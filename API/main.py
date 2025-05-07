@@ -6,9 +6,9 @@ app = Flask(__name__)
 CORS(app)
 
 # Konfigurasi koneksi MongoDB
-app.config["MONGO_URI"] = "mongodb://localhost:27017/test"  # db 'test'
+app.config["MONGO_URI"] = "mongodb://localhost:27017/test" 
 mongo = PyMongo(app)
-users = mongo.db.test  # collection 'test' di db 'test'
+users = mongo.db.test
 
 # Registrasi pengguna
 @app.route('/register', methods=['POST'])
