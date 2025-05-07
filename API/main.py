@@ -5,7 +5,6 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# Konfigurasi koneksi MongoDB
 app.config["MONGO_URI"] = "mongodb://localhost:27017/test" 
 mongo = PyMongo(app)
 users = mongo.db.test
