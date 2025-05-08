@@ -3,7 +3,6 @@ import 'create_account.dart';
 import 'login_page.dart';
 // import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -43,7 +42,7 @@ class OnboardingPage extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               const Text(
-                'KitHeart Apps',
+                'HeartGuard',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
