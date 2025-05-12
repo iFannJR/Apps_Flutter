@@ -90,7 +90,7 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                 DropdownButtonFormField<String>(
                   decoration: const InputDecoration(labelText: 'Jenis Kelamin'),
                   value: _gender,
-                  items: ['Cowok', 'Cewek'].map((String value) {
+                  items: ['Laki-Laki', 'Wanita'].map((String value) {
                     return DropdownMenuItem<String>(
                         value: value, child: Text(value));
                   }).toList(),
