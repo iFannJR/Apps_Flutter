@@ -22,4 +22,7 @@ flutter:
   assets:
     - data/gambar1.png
     - data/gambar2.png
+    - data/gambar3.png
+    - data/gambar4.png
+
 

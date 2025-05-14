@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'riwayat_page.dart';
 import 'klasifikasi_page.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -12,7 +11,7 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage>
     with SingleTickerProviderStateMixin {
-  int _selectedIndex = 2; // Default ke dashboard (di paling kanan)
+  int _selectedIndex = 1; // Default ke dashboard (di paling kanan)
 
   // Controller dan query pencarian
   final TextEditingController _searchController = TextEditingController();
@@ -31,7 +30,6 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   List<Widget> get _pages => [
-        const RiwayatPage(),
         const KlasifikasiPage(),
         _DashboardHome(
           searchController: _searchController,
@@ -73,10 +71,6 @@ class _DashboardPageState extends State<DashboardPage>
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history),
-              label: 'Riwayat',
-            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart),
               label: 'Klasifikasi',
