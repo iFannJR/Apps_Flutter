@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/services.dart';
 
 class KlasifikasiPage extends StatefulWidget {
   const KlasifikasiPage({super.key});
@@ -113,14 +114,16 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                       controller: _ageController,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(labelText: 'Usia'),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Silakan masukkan usia';
+                          return 'Silakan masukkan Usia';
                         }
                         return null;
                       },
                     ),
-
 
                     const SizedBox(height: 10),
 
@@ -169,7 +172,6 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
 
                     const SizedBox(height: 10),
 
-
                     // Tekanan Darah
                     TextFormField(
                       controller: _bloodPressureController,
@@ -183,7 +185,6 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                         return null;
                       },
                     ),
-
 
                     const SizedBox(height: 10),
 
@@ -201,7 +202,6 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                       },
                     ),
 
-
                     const SizedBox(height: 10),
 
                     // Detak Jantung Maksimum
@@ -217,8 +217,6 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                         return null;
                       },
                     ),
-
-
 
                     const SizedBox(height: 10),
 
