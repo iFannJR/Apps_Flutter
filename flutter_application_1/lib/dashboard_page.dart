@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'klasifikasi_page.dart';
+import 'edukasi_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -246,16 +247,10 @@ class _DashboardHome extends StatelessWidget {
                         // Edukasi Card
                         GestureDetector(
                           onTap: () {
-                            // Navigate to Edukasi page when implemented
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const Scaffold(
-                                  body: Center(
-                                    child:
-                                        Text('Halaman Edukasi - Coming Soon'),
-                                  ),
-                                ),
+                                builder: (context) => const EdukasiPage(),
                               ),
                             );
                           },
