@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'create_account.dart';
-import 'login_page.dart';
+import 'dashboard_page.dart';
+import 'package:animate_do/animate_do.dart';
 // import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 void main() {
@@ -14,13 +14,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const OnboardingPage(),
+      home: const LandingPage(),
     );
   }
 }
 
-class OnboardingPage extends StatelessWidget {
-  const OnboardingPage({super.key});
+class LandingPage extends StatelessWidget {
+  const LandingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,9 @@ class OnboardingPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(flex: 2),
-              Center(
+              // Animated logo
+              FadeInDown(
+                duration: const Duration(milliseconds: 1000),
                 child: Image.asset(
                   'data/gambar1.png',
                   width: 300,
@@ -41,71 +43,80 @@ class OnboardingPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 48),
-              const Text(
-                'HeartGuard',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Pendamping cerdas Anda untuk manajemen Jantung anda\nMasuk atau buat akun untuk merasakan kemudahannya.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-              const Spacer(flex: 3),
-
-              // Tombol Sign In
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    'Sign In',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white, // teks putih
-                    ),
+              // Animated title
+              FadeInUp(
+                duration: const Duration(milliseconds: 1000),
+                child: const Text(
+                  'HeartGuard',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
                   ),
                 ),
               ),
-
-              const SizedBox(height: 16),
-
-              // Tombol Create Account
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.black),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+              const SizedBox(height: 12),
+              // Animated subtitle
+              FadeInUp(
+                duration: const Duration(milliseconds: 1200),
+                child: const Text(
+                  'Pendamping cerdas Anda untuk manajemen Jantung anda',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                    height: 1.5,
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CreateAccountPage(),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const Spacer(flex: 3),
+
+              // Animated start button
+              FadeInUp(
+                duration: const Duration(milliseconds: 1400),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    );
-                  },
-                  child: const Text(
-                    'Create account',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
+                      elevation: 4,
+                    ),
+                    onPressed: () {
+                      // Add button press animation
+                      Navigator.pushReplacement(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const DashboardPage(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            var begin = const Offset(1.0, 0.0);
+                            var end = Offset.zero;
+                            var curve = Curves.easeInOut;
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            return SlideTransition(
+                              position: animation.drive(tween),
+                              child: child,
+                            );
+                          },
+                          transitionDuration: const Duration(milliseconds: 500),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Mulai',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
