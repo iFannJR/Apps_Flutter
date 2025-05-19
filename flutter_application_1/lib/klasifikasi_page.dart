@@ -105,6 +105,9 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                         return null;
                       },
                     ),
+
+                    const SizedBox(height: 10),
+
                     // Usia
                     TextFormField(
                       controller: _ageController,
@@ -163,7 +166,11 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                         return null;
                       },
                     ),
-                                        // Tekanan Darah
+
+                    const SizedBox(height: 10),
+
+
+                    // Tekanan Darah
                     TextFormField(
                       controller: _bloodPressureController,
                       keyboardType: TextInputType.number,
@@ -194,8 +201,6 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                       },
                     ),
 
-                    const SizedBox(height: 10),
-
 
                     const SizedBox(height: 10),
 
@@ -204,7 +209,7 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                       controller: _heartRateController,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                          labelText: 'Detak Jantung Maksimum'),
+                          labelText: 'Detak Jantung Maksimum (bpm)'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Silakan masukkan detak jantung maksimum';
@@ -212,8 +217,6 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                         return null;
                       },
                     ),
-
-                    const SizedBox(height: 10),
 
 
 
