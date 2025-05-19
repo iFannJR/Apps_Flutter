@@ -101,8 +101,38 @@ class _DashboardHome extends StatelessWidget {
     required this.onNavigate,
   });
 
+  // List edukasi untuk pencarian
+  List<Map<String, dynamic>> get edukasiList => [
+        {
+          'title': 'Pentingnya Olahraga bagi Penderita Penyakit Jantung:',
+          'color': const Color(0xFFD1834F),
+        },
+        {
+          'title': 'Jenis Olahraga yang Umumnya Aman dan Direkomendasikan:',
+          'color': const Color(0xFFEFD2BC),
+        },
+        {
+          'title': 'Hal yang Perlu Diperhatikan Sebelum dan Saat Berolahraga:',
+          'color': const Color(0xFFD0CBC7),
+        },
+        {
+          'title': 'Contoh Program Olahraga Ringan:',
+          'color': const Color(0xFFC0867D),
+        },
+      ];
+
   @override
   Widget build(BuildContext context) {
+    // Filter edukasi sesuai query
+    final filteredEdukasi = searchQuery.isEmpty
+        ? []
+        : edukasiList
+            .where((item) => item['title']
+                .toString()
+                .toLowerCase()
+                .contains(searchQuery.toLowerCase()))
+            .toList();
+
     return SafeArea(
       child: Column(
         children: [
@@ -189,6 +219,38 @@ class _DashboardHome extends StatelessWidget {
                         ],
                       ),
                     ),
+                  ),
+                if (searchQuery.isNotEmpty)
+                  Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: filteredEdukasi.isEmpty
+                        ? const Center(child: Text('Tidak ada hasil ditemukan'))
+                        : ListView.builder(
+                            itemCount: filteredEdukasi.length,
+                            itemBuilder: (context, index) {
+                              final item = filteredEdukasi[index];
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: item['color'],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  item['title'],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                   ),
               ],
             ),
