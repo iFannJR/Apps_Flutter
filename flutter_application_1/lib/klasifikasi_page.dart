@@ -163,7 +163,9 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Material(
+        // backgroundColor: Colors.white,
         child: SafeArea(
           child: FadeTransition(
             opacity: _fadeIn,

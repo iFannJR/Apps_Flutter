@@ -54,65 +54,71 @@ class _EdukasiPageState extends State<EdukasiPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
+            // Header + Search bar
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
               decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.black87, Colors.black54],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: Colors.black,
                 borderRadius:
                     BorderRadius.vertical(bottom: Radius.circular(20)),
               ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Expanded(
-                    child: Text(
-                      "EDUKASI",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          "Edukasi",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                    ),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFD1834F),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.tune, color: Colors.white),
+                      ),
+                    ],
                   ),
-                  Icon(Icons.search, color: Colors.white),
-                  const SizedBox(width: 10),
+                  const SizedBox(height: 18),
+                  // Search bar (sama seperti dashboard)
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    height: 48,
                     decoration: BoxDecoration(
-                      color: Color(0xFFD1834F),
+                      color: Colors.grey[900],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.tune, color: Colors.white),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.search, color: Colors.white70),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: (value) {
+                              setState(() {
+                                _searchQuery = value;
+                              });
+                            },
+                            style: const TextStyle(color: Colors.white54),
+                            decoration: const InputDecoration.collapsed(
+                              hintText: "Cari edukasi...",
+                              hintStyle: TextStyle(color: Colors.white54),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
-              ),
-            ),
-
-            // Search bar
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      _searchQuery = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    hintText: 'Cari edukasi...',
-                    border: InputBorder.none,
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                ),
               ),
             ),
 
@@ -164,6 +170,7 @@ class _EdukasiPageState extends State<EdukasiPage> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 1.2,
+                                      color: Colors.white
                                     ),
                                   ),
                                 ),
