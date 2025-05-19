@@ -178,6 +178,9 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                           labelText: 'Tekanan Darah Saat Istirahat (mm Hg)'),
+                          inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Silakan masukkan tekanan darah';
@@ -194,6 +197,9 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                           labelText: 'Kadar Kolesterol (mg/dl)'),
+                          inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Silakan masukkan kadar kolesterol';
@@ -210,6 +216,9 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                           labelText: 'Detak Jantung Maksimum (bpm)'),
+                          inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Silakan masukkan detak jantung maksimum';
