@@ -165,7 +165,7 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
     return Scaffold(
       backgroundColor: Colors.white,
       body: Material(
-        // backgroundColor: Colors.white,
+        color: Colors.white,
         child: SafeArea(
           child: FadeTransition(
             opacity: _fadeIn,
