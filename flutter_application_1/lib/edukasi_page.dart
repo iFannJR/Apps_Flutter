@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'edukasi_detail_jantung.dart';
+import 'edukasi_detail_jenis_olahraga.dart';
 
 class EdukasiPage extends StatefulWidget {
   const EdukasiPage({super.key});
@@ -164,14 +166,31 @@ class _EdukasiPageState extends State<EdukasiPage> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    if (index == 0) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const EdukasiDetailJantungPage(),
+                                        ),
+                                      );
+                                    } else if (index == 1) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const EdukasiDetailJenisOlahragaPage(),
+                                        ),
+                                      );
+                                    }
+                                  },
                                   child: const Text(
                                     "PELAJARI LEBIH LANJUT",
                                     style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 1.2,
-                                      color: Colors.white
-                                    ),
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.2,
+                                        color: Colors.white),
                                   ),
                                 ),
                               ],
