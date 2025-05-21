@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-// import 'edukasi_page.dart';
 
 // animasinya menggunakan FadeInUp
-class EdukasiDetailJantungPage extends StatelessWidget {
-  const EdukasiDetailJantungPage({super.key});
+class EdukasiDetailProgramRinganPage extends StatelessWidget {
+  const EdukasiDetailProgramRinganPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +46,7 @@ class EdukasiDetailJantungPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Pentingnya Olahraga bagi Penderita Penyakit Jantung:',
+                        'Contoh Program Olahraga Ringan:',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -55,19 +54,13 @@ class EdukasiDetailJantungPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       _buildBulletPoint(
-                        'Memperkuat jantung: Olahraga teratur dapat membantu memperkuat otot jantung, sehingga jantung dapat memompa darah lebih efisien.',
+                        'Hari 1–3: Jalan kaki santai selama 15–20 menit.',
                       ),
                       _buildBulletPoint(
-                        'Meningkatkan sirkulasi darah: Aktivitas fisik membantu melancarkan aliran darah ke seluruh tubuh.',
+                        'Hari 4–6: Bersepeda santai atau berenang selama 20–25 menit.',
                       ),
                       _buildBulletPoint(
-                        'Mengendalikan berat badan: Olahraga membantu membakar kalori dan menjaga berat badan yang sehat, yang penting untuk kesehatan jantung.',
-                      ),
-                      _buildBulletPoint(
-                        'Mengurangi stres: Aktivitas fisik dapat membantu mengurangi stres dan meningkatkan suasana hati.',
-                      ),
-                      _buildBulletPoint(
-                        'Menurunkan tekanan darah dan kolesterol: Beberapa jenis olahraga dapat membantu menurunkan tekanan darah tinggi dan kadar kolesterol jahat (LDL).',
+                        'Lakukan ini beberapa kali seminggu dan secara bertahap tingkatkan durasi dan intensitasnya sesuai dengan anjuran dokter dan kemampuan tubuh Anda.',
                       ),
                       const SizedBox(height: 40),
                     ],

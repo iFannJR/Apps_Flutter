@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-// import 'edukasi_page.dart';
 
 // animasinya menggunakan FadeInUp
-class EdukasiDetailJantungPage extends StatelessWidget {
-  const EdukasiDetailJantungPage({super.key});
+class EdukasiDetailPerhatianOlahragaPage extends StatelessWidget {
+  const EdukasiDetailPerhatianOlahragaPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +46,7 @@ class EdukasiDetailJantungPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Pentingnya Olahraga bagi Penderita Penyakit Jantung:',
+                        'Hal yang Perlu Diperhatikan Sebelum dan Saat Berolahraga:',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -55,19 +54,25 @@ class EdukasiDetailJantungPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       _buildBulletPoint(
-                        'Memperkuat jantung: Olahraga teratur dapat membantu memperkuat otot jantung, sehingga jantung dapat memompa darah lebih efisien.',
+                        'Konsultasi dengan dokter: Sangat penting untuk berkonsultasi dengan dokter sebelum memulai program olahraga baru. Dokter dapat memberikan rekomendasi jenis dan intensitas olahraga yang aman sesuai dengan kondisi jantung Anda.',
                       ),
                       _buildBulletPoint(
-                        'Meningkatkan sirkulasi darah: Aktivitas fisik membantu melancarkan aliran darah ke seluruh tubuh.',
+                        'Pemanasan dan pendinginan: Selalu lakukan pemanasan sebelum berolahraga dan pendinginan setelahnya.',
                       ),
                       _buildBulletPoint(
-                        'Mengendalikan berat badan: Olahraga membantu membakar kalori dan menjaga berat badan yang sehat, yang penting untuk kesehatan jantung.',
+                        'Mulai secara bertahap: Jangan memaksakan diri, mulailah dengan intensitas rendah dan durasi singkat, lalu tingkatkan secara perlahan sesuai kemampuan.',
                       ),
                       _buildBulletPoint(
-                        'Mengurangi stres: Aktivitas fisik dapat membantu mengurangi stres dan meningkatkan suasana hati.',
+                        'Perhatikan gejala: Hentikan olahraga segera jika Anda merasakan nyeri dada, sesak napas berlebihan, pusing, atau detak jantung tidak teratur. Segera konsultasikan dengan dokter jika gejala tersebut muncul.',
                       ),
                       _buildBulletPoint(
-                        'Menurunkan tekanan darah dan kolesterol: Beberapa jenis olahraga dapat membantu menurunkan tekanan darah tinggi dan kadar kolesterol jahat (LDL).',
+                        'Hindari olahraga berat: Olahraga dengan intensitas tinggi atau kompetitif seperti sepak bola, bola basket, atau bulu tangkis umumnya tidak disarankan.',
+                      ),
+                      _buildBulletPoint(
+                        'Perhatikan waktu: Sebaiknya berolahraga di pagi hari saat tubuh lebih segar.',
+                      ),
+                      _buildBulletPoint(
+                        'Cukupi cairan: Pastikan minum air yang cukup sebelum, selama, dan setelah berolahraga.',
                       ),
                       const SizedBox(height: 40),
                     ],

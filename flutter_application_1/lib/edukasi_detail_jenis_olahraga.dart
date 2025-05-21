@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 
+// animasinya menggunakan FadeInUp
 class EdukasiDetailJenisOlahragaPage extends StatelessWidget {
   const EdukasiDetailJenisOlahragaPage({super.key});
 

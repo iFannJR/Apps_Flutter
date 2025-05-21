@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'edukasi_detail_jantung.dart';
 import 'edukasi_detail_jenis_olahraga.dart';
+import 'edukasi_detail_perhatian_olahraga.dart';
+import 'edukasi_detail_program_ringan.dart';
 
 class EdukasiPage extends StatefulWidget {
   const EdukasiPage({super.key});
@@ -181,6 +183,22 @@ class _EdukasiPageState extends State<EdukasiPage> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               const EdukasiDetailJenisOlahragaPage(),
+                                        ),
+                                      );
+                                    } else if (index == 2) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const EdukasiDetailPerhatianOlahragaPage(),
+                                        ),
+                                      );
+                                    } else if (index == 3) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const EdukasiDetailProgramRinganPage(),
                                         ),
                                       );
                                     }
