@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'klasifikasi_page.dart';
 import 'edukasi_page.dart';
 
@@ -12,9 +11,8 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage>
     with SingleTickerProviderStateMixin {
-  int _selectedIndex = 1; // Default ke dashboard (di paling kanan)
+  int _selectedIndex = 1;
 
-  // Controller dan query pencarian
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -101,7 +99,6 @@ class _DashboardHome extends StatelessWidget {
     required this.onNavigate,
   });
 
-  // List edukasi untuk pencarian
   List<Map<String, dynamic>> get edukasiList => [
         {
           'title': 'Pentingnya Olahraga bagi Penderita Penyakit Jantung:',
@@ -123,7 +120,6 @@ class _DashboardHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Filter edukasi sesuai query
     final filteredEdukasi = searchQuery.isEmpty
         ? []
         : edukasiList
@@ -193,33 +189,7 @@ class _DashboardHome extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 24),
-                if (searchQuery.isEmpty)
-                  Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: BarChart(
-                      BarChartData(
-                        borderData: FlBorderData(show: false),
-                        titlesData: FlTitlesData(show: false),
-                        barGroups: [
-                          for (int i = 0; i < 5; i++)
-                            BarChartGroupData(
-                              x: i,
-                              barRods: [
-                                BarChartRodData(
-                                    toY: (i + 1) * 2.0,
-                                    color: Colors.blueAccent,
-                                    width: 16),
-                              ],
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
+                if (searchQuery.isEmpty) const _TimeWidget(),
                 if (searchQuery.isNotEmpty)
                   Container(
                     height: 200,
@@ -266,7 +236,6 @@ class _DashboardHome extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        // Klasifikasi Card
                         GestureDetector(
                           onTap: () => onNavigate(0),
                           child: Column(
@@ -305,8 +274,6 @@ class _DashboardHome extends StatelessWidget {
                             ],
                           ),
                         ),
-
-                        // Edukasi Card
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -355,6 +322,112 @@ class _DashboardHome extends StatelessWidget {
                       ],
                     ),
                   ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TimeWidget extends StatefulWidget {
+  const _TimeWidget({super.key});
+
+  @override
+  State<_TimeWidget> createState() => _TimeWidgetState();
+}
+
+class _TimeWidgetState extends State<_TimeWidget> {
+  late TimeOfDay _time;
+  late DateTime _dateTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateTime();
+  }
+
+  void _updateTime() {
+    setState(() {
+      _dateTime = DateTime.now();
+      _time = TimeOfDay.fromDateTime(_dateTime);
+    });
+    Future.delayed(const Duration(seconds: 1), _updateTime);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hour = _time.hour.toString().padLeft(2, '0');
+    final minute = _time.minute.toString().padLeft(2, '0');
+    final formattedDate =
+        "${_dateTime.day}/${_dateTime.month}/${_dateTime.year}";
+    final isMorning = _time.hour >= 5 && _time.hour <= 18;
+    final icon = isMorning ? Icons.wb_sunny_rounded : Icons.nights_stay_rounded;
+    final iconColor = isMorning ? Colors.orange : Colors.indigo;
+
+    return Container(
+      height: 200,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          )
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          // Jam & Icon
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                child: Icon(
+                  icon,
+                  key: ValueKey(icon),
+                  size: 48,
+                  color: iconColor,
+                ),
+              ),
+              const SizedBox(height: 12),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                child: Text(
+                  "$hour:$minute",
+                  key: ValueKey("$hour:$minute"),
+                  style: const TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                formattedDate,
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            ],
+          ),
+          const SizedBox(width: 24),
+          // Teks motivasi
+          Expanded(
+            child: AnimatedOpacity(
+              opacity: 1,
+              duration: const Duration(milliseconds: 800),
+              child: Text(
+                "Selalu jaga kesehatan\njantung Anda <3 \n\nDan selalu berolahraga",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                  height: 1.4,
                 ),
               ),
             ),

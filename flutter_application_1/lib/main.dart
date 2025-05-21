@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dashboard_page.dart';
 import 'package:animate_do/animate_do.dart';
-// import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+
 
 void main() {
   runApp(const MyApp());
 }
-
+// animasinya menggunakan ElevatedButton
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -43,6 +43,7 @@ class LandingPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 48),
+
               // Animated title
               FadeInUp(
                 duration: const Duration(milliseconds: 1000),
@@ -85,6 +86,7 @@ class LandingPage extends StatelessWidget {
                       ),
                       elevation: 4,
                     ),
+
                     onPressed: () {
                       // Add button press animation
                       Navigator.pushReplacement(
