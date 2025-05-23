@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'dashboard_page.dart';
 import 'package:animate_do/animate_do.dart';
-
+import 'login_page.dart';
+import 'create_account.dart';
 
 void main() {
   runApp(const MyApp());
 }
-// animasinya menggunakan ElevatedButton
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -72,7 +73,7 @@ class LandingPage extends StatelessWidget {
               ),
               const Spacer(flex: 3),
 
-              // Animated start button
+              // Login Button
               FadeInUp(
                 duration: const Duration(milliseconds: 1400),
                 child: SizedBox(
@@ -86,37 +87,56 @@ class LandingPage extends StatelessWidget {
                       ),
                       elevation: 4,
                     ),
-
                     onPressed: () {
-                      // Add button press animation
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  const DashboardPage(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            var begin = const Offset(1.0, 0.0);
-                            var end = Offset.zero;
-                            var curve = Curves.easeInOut;
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            return SlideTransition(
-                              position: animation.drive(tween),
-                              child: child,
-                            );
-                          },
-                          transitionDuration: const Duration(milliseconds: 500),
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPage(),
                         ),
                       );
                     },
                     child: const Text(
-                      'Mulai',
+                      'Login',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Register Button
+              FadeInUp(
+                duration: const Duration(milliseconds: 1500),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: const BorderSide(color: Colors.black),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CreateAccountPage(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Register',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
                   ),
