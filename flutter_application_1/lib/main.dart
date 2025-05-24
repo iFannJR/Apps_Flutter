@@ -3,6 +3,8 @@ import 'dashboard_page.dart';
 import 'package:animate_do/animate_do.dart';
 import 'login_page.dart';
 import 'create_account.dart';
+import 'auth_service.dart';
+import 'unverified_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,8 +17,93 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const LandingPage(),
+      home: const AuthWrapper(),
     );
+  }
+}
+
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  final AuthService _authService = AuthService();
+  bool _isLoading = true;
+  bool _isAuthenticated = false;
+  bool _isVerified = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthState();
+  }
+
+  Future<void> _checkAuthState() async {
+    try {
+      // First check if we have a token
+      final token = await _authService.getToken();
+      if (token == null || token.isEmpty) {
+        setState(() {
+          _isAuthenticated = false;
+          _isVerified = false;
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // If we have a token, get the user profile directly
+      try {
+        final profile = await _authService.getUserProfile();
+        final isVerified = profile['verified'] == true;
+
+        setState(() {
+          _isAuthenticated = true;
+          _isVerified = isVerified;
+          _isLoading = false;
+        });
+      } catch (e) {
+        print('Error getting user profile: $e');
+        // If we can't get the profile, assume not verified
+        setState(() {
+          _isAuthenticated = true;
+          _isVerified = false;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error in auth state check: $e');
+      // If anything goes wrong, clear everything
+      await _authService.logout();
+      setState(() {
+        _isAuthenticated = false;
+        _isVerified = false;
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (!_isAuthenticated) {
+      return const LandingPage();
+    }
+
+    if (!_isVerified) {
+      return const UnverifiedPage();
+    }
+
+    return const DashboardPage();
   }
 }
 
@@ -88,7 +175,7 @@ class LandingPage extends StatelessWidget {
                       elevation: 4,
                     ),
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const LoginPage(),
@@ -124,7 +211,7 @@ class LandingPage extends StatelessWidget {
                       elevation: 0,
                     ),
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const CreateAccountPage(),

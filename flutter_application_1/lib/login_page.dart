@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dashboard_page.dart';
 import 'create_account.dart';
+import 'auth_service.dart';
+import 'unverified_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,38 +13,91 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
-  bool _rememberMe = true;
+  bool _rememberMe =
+      true; // Logika "Remember Me" belum diimplementasikan sepenuhnya
+  bool _isLoading = false; // <-- 2. Tambahkan state untuk loading
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _showSnackBar(String message, {bool success = false}) {
+  final AuthService _authService =
+      AuthService(); // <-- 3. Instansiasi AuthService
+
+  @override
+  void dispose() {
+    _emailController.dispose(); // <-- 4. Dispose controller
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _showAlert(String message, {bool isError = true}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: success ? Colors.green : Colors.redAccent,
-        duration: const Duration(seconds: 2),
+        backgroundColor: isError ? Colors.redAccent : Colors.green,
       ),
     );
   }
 
-  void _login() {
-    String email = _emailController.text.trim();
-    String password = _passwordController.text;
+  void _showSnackBar(String message, {bool success = false}) {
+    if (!mounted) return; // Pastikan widget masih ada di tree
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: success ? Colors.green : Colors.redAccent,
+        duration:
+            const Duration(seconds: 3), // Sedikit lebih lama untuk pesan error
+      ),
+    );
+  }
 
-    if (email.isEmpty || password.isEmpty) {
-      _showSnackBar('Tolong isi Password dan Email.');
-    } else {
-      // Menampilkan snackbar sukses, lalu navigasi setelah delay
-      _showSnackBar('Login Berhasil!', success: true);
-      Future.delayed(const Duration(seconds: 2), () {
+  Future<void> _login() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      _showAlert('Email dan password harus diisi');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _authService.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      // Check verification status after successful login
+      final isVerified = await _authService.isEmailVerified();
+
+      if (!mounted) return;
+
+      if (!isVerified) {
+        // Navigate to unverified page if email is not verified
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const UnverifiedPage(),
+          ),
+        );
+      } else {
+        // Navigate to dashboard if email is verified
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => const DashboardPage(),
           ),
         );
-      });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showAlert(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -60,8 +115,11 @@ class _LoginPageState extends State<LoginPage> {
               Align(
                 alignment: Alignment.topRight,
                 child: Image.asset(
-                  'data/gambar2.png',
+                  'data/gambar2.png', // Pastikan path asset ini benar
                   height: 40,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                      Icons.image_not_supported,
+                      size: 40), // Fallback jika gambar tidak ada
                 ),
               ),
               const SizedBox(height: 24),
@@ -77,6 +135,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 8),
               TextField(
                 controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: 'Your email',
                   border: OutlineInputBorder(
@@ -85,6 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                   filled: true,
                   fillColor: Colors.white,
                 ),
+                enabled: !_isLoading, // Disable saat loading
               ),
               const SizedBox(height: 16),
               const Text("Password"),
@@ -112,6 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                 ),
+                enabled: !_isLoading, // Disable saat loading
               ),
               const SizedBox(height: 12),
               Row(
@@ -119,11 +180,14 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Checkbox(
                     value: _rememberMe,
-                    onChanged: (value) {
-                      setState(() {
-                        _rememberMe = value ?? false;
-                      });
-                    },
+                    onChanged: _isLoading
+                        ? null
+                        : (value) {
+                            // Disable saat loading
+                            setState(() {
+                              _rememberMe = value ?? false;
+                            });
+                          },
                     activeColor: Colors.black,
                   ),
                   const Text('Remember me'),
@@ -139,32 +203,49 @@ class _LoginPageState extends State<LoginPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    disabledBackgroundColor:
+                        Colors.grey.shade400, // Warna saat tombol disable
                   ),
-                  onPressed: _login,
-                  child: const Text(
-                    'Log in',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
+                  onPressed:
+                      _isLoading ? null : _login, // Disable tombol saat loading
+                  child: _isLoading
+                      ? const SizedBox(
+                          // <-- 8. Tampilkan CircularProgressIndicator
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text(
+                          'Log in',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 24),
               Center(
                 child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CreateAccountPage(),
-                      ),
-                    );
-                  },
+                  onTap: _isLoading
+                      ? null
+                      : () {
+                          // Disable saat loading
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CreateAccountPage(),
+                            ),
+                          );
+                        },
                   child: const Text.rich(
                     TextSpan(
-                      text: "Don’t have an account? ",
+                      text: "Don't have an account? ",
                       style: TextStyle(color: Colors.black54),
                       children: [
                         TextSpan(

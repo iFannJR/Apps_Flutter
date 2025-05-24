@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'klasifikasi_page.dart';
 import 'edukasi_page.dart';
 import 'riwayat_page.dart';
+import 'auth_service.dart';
+import 'main.dart';
+import 'dart:async';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -139,13 +142,31 @@ class _DashboardHome extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Dashboard",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Dashboard",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.logout, color: Colors.white),
+                      onPressed: () async {
+                        final authService = AuthService();
+                        await authService.logout();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AuthWrapper(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -324,7 +345,6 @@ class _DashboardHome extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    
                     // Riwayat Button
                     GestureDetector(
                       onTap: () {
@@ -399,6 +419,7 @@ class _TimeWidget extends StatefulWidget {
 class _TimeWidgetState extends State<_TimeWidget> {
   late TimeOfDay _time;
   late DateTime _dateTime;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -406,12 +427,18 @@ class _TimeWidgetState extends State<_TimeWidget> {
     _updateTime();
   }
 
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   void _updateTime() {
     setState(() {
       _dateTime = DateTime.now();
       _time = TimeOfDay.fromDateTime(_dateTime);
     });
-    Future.delayed(const Duration(seconds: 1), _updateTime);
+    _timer = Timer(const Duration(seconds: 1), _updateTime);
   }
 
   @override

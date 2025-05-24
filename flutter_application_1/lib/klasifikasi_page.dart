@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'auth_service.dart';
+import 'login_page.dart';
 
 class KlasifikasiPage extends StatefulWidget {
   const KlasifikasiPage({super.key});
@@ -14,6 +16,9 @@ class KlasifikasiPage extends StatefulWidget {
 class _KlasifikasiPageState extends State<KlasifikasiPage>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final _authService = AuthService();
+  Map<String, dynamic>? _userData;
+  bool _isLoading = true;
 
   final TextEditingController _nameController = TextEditingController();
   String? _gender;
@@ -29,8 +34,6 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
   late AnimationController _animationController;
   late Animation<double> _fadeIn;
 
-  bool _isLoading = false;
-
   @override
   void initState() {
     super.initState();
@@ -39,6 +42,42 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
     _fadeIn =
         CurvedAnimation(parent: _animationController, curve: Curves.easeIn);
     _animationController.forward();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+          );
+        }
+        return;
+      }
+
+      final userData = await _authService.getUserProfile();
+      if (mounted) {
+        setState(() {
+          _userData = userData;
+          _nameController.text = userData['name'] ?? '';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      }
+    }
   }
 
   @override
@@ -59,9 +98,16 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
       });
 
       try {
+        final token = await _authService.getToken();
+        if (token == null) {
+          throw Exception('Not authenticated');
+        }
+
         // Prepare data to send
         final Map<String, dynamic> data = {
+          'user_id': _userData?['id'],
           'name': _nameController.text,
+          'email': _userData?['email'],
           'age': int.tryParse(_ageController.text) ?? 0,
           'sex': _gender == 'Laki-Laki' ? 1 : 0,
           'cp': _getChestPainTypeValue(),
@@ -74,9 +120,14 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
         // Send data to API
         final response = await http.post(
           Uri.parse('http://127.0.0.1:8000/api/klasifikasi'),
-          headers: {'Content-Type': 'application/json'},
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
           body: jsonEncode(data),
         );
+
+        if (!mounted) return;
 
         setState(() {
           _isLoading = false;
@@ -87,16 +138,25 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
           final hasil = responseData['hasil']?.toString() ??
               'Tidak ada hasil dari server';
           _showResultDialog(hasil);
+        } else if (response.statusCode == 401) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+          );
         } else {
           _showErrorDialog(
               'Gagal terhubung dengan server. Status: ${response.statusCode}');
         }
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${e.toString()}")),
+          SnackBar(
+            content: Text("Error: ${e.toString()}"),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -162,6 +222,14 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Material(

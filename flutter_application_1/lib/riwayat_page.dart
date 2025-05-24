@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'auth_service.dart';
 
 class RiwayatPage extends StatefulWidget {
   const RiwayatPage({super.key});
@@ -9,30 +12,10 @@ class RiwayatPage extends StatefulWidget {
 
 class _RiwayatPageState extends State<RiwayatPage>
     with SingleTickerProviderStateMixin {
-  final List<Map<String, dynamic>> dataPasien = [
-    {
-      'nama': 'Rudi',
-      'usia': 45,
-      'jenis_kelamin': 'Laki-Laki',
-      'tipe_nyeri': 'Typical Angina',
-      'tekanan_darah': 130,
-      'kolesterol': 250,
-      'detak_jantung': 150,
-      'nyeri_olahraga': 'Iya',
-      'hasil': 'Positif',
-    },
-    {
-      'nama': 'Amba Singh',
-      'usia': 39,
-      'jenis_kelamin': 'Laki-Laki',
-      'tipe_nyeri': 'Atypical Angina',
-      'tekanan_darah': 120,
-      'kolesterol': 190,
-      'detak_jantung': 140,
-      'nyeri_olahraga': 'Tidak',
-      'hasil': 'Negatif',
-    },
-  ];
+  final _authService = AuthService();
+  List<Map<String, dynamic>> _riwayatData = [];
+  bool _isLoading = true;
+  String? _error;
 
   late AnimationController _animationController;
   late Animation<double> _fadeIn;
@@ -49,6 +32,53 @@ class _RiwayatPageState extends State<RiwayatPage>
       curve: Curves.easeIn,
     );
     _animationController.forward();
+    _loadRiwayat();
+  }
+
+  Future<void> _loadRiwayat() async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Not authenticated');
+      }
+
+      final userData = await _authService.getUserProfile();
+      final userId = userData['id'];
+
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/api/riwayat'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'user_id': userId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        if (responseData['status'] == 'success') {
+          setState(() {
+            _riwayatData =
+                List<Map<String, dynamic>>.from(responseData['riwayat']);
+            _isLoading = false;
+          });
+        } else {
+          throw Exception(responseData['message'] ?? 'Failed to load riwayat');
+        }
+      } else if (response.statusCode == 401) {
+        throw Exception('Unauthorized');
+      } else {
+        final Map<String, dynamic> errorData = jsonDecode(response.body);
+        throw Exception(errorData['message'] ?? 'Failed to load riwayat');
+      }
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -80,60 +110,103 @@ class _RiwayatPageState extends State<RiwayatPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(16),
+                if (_isLoading)
+                  const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
                     ),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        columnSpacing: 24,
-                        columns: const [
-                          DataColumn(label: Text('Nama')),
-                          DataColumn(label: Text('Usia')),
-                          DataColumn(label: Text('Jenis Kelamin')),
-                          DataColumn(label: Text('Tipe Nyeri')),
-                          DataColumn(label: Text('Tekanan Darah')),
-                          DataColumn(label: Text('Kolesterol')),
-                          DataColumn(label: Text('Detak Jantung')),
-                          DataColumn(label: Text('Nyeri Olahraga')),
-                          DataColumn(label: Text('Hasil')),
-                        ],
-                        rows: dataPasien.map((pasien) {
-                          return DataRow(cells: [
-                            DataCell(Text(pasien['nama'])),
-                            DataCell(Text('${pasien['usia']}')),
-                            DataCell(Text(pasien['jenis_kelamin'])),
-                            DataCell(Text(pasien['tipe_nyeri'])),
-                            DataCell(Text('${pasien['tekanan_darah']} mmHg')),
-                            DataCell(Text('${pasien['kolesterol']} mg/dL')),
-                            DataCell(Text('${pasien['detak_jantung']} bpm')),
-                            DataCell(Text(pasien['nyeri_olahraga'])),
-                            DataCell(
-                              Text(
-                                pasien['hasil'],
-                                style: TextStyle(
-                                  color: pasien['hasil'] == 'Positif'
-                                      ? Colors.red
-                                      : Colors.green,
-                                  fontWeight: FontWeight.bold,
+                  )
+                else if (_error != null)
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'Error: $_error',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  )
+                else if (_riwayatData.isEmpty)
+                  const Expanded(
+                    child: Center(
+                      child: Text('Belum ada riwayat klasifikasi'),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          columnSpacing: 24,
+                          columns: const [
+                            DataColumn(label: Text('Nama')),
+                            DataColumn(label: Text('Usia')),
+                            DataColumn(label: Text('Jenis Kelamin')),
+                            DataColumn(label: Text('Tipe Nyeri')),
+                            DataColumn(label: Text('Tekanan Darah')),
+                            DataColumn(label: Text('Kolesterol')),
+                            DataColumn(label: Text('Detak Jantung')),
+                            DataColumn(label: Text('Nyeri Olahraga')),
+                            DataColumn(label: Text('Hasil')),
+                          ],
+                          rows: _riwayatData.map((riwayat) {
+                            return DataRow(cells: [
+                              DataCell(Text(riwayat['name'] ?? '')),
+                              DataCell(Text('${riwayat['age'] ?? ''}')),
+                              DataCell(Text(riwayat['sex'] == 1
+                                  ? 'Laki-Laki'
+                                  : 'Wanita')),
+                              DataCell(Text(_getChestPainType(riwayat['cp']))),
+                              DataCell(
+                                  Text('${riwayat['trestbps'] ?? ''} mmHg')),
+                              DataCell(Text('${riwayat['chol'] ?? ''} mg/dL')),
+                              DataCell(Text('${riwayat['thalach'] ?? ''} bpm')),
+                              DataCell(Text(
+                                  riwayat['exang'] == 1 ? 'Iya' : 'Tidak')),
+                              DataCell(
+                                Text(
+                                  riwayat['hasil'] ?? '',
+                                  style: TextStyle(
+                                    color: (riwayat['hasil'] ?? '')
+                                            .toLowerCase()
+                                            .contains('positif')
+                                        ? Colors.red
+                                        : Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ]);
-                        }).toList(),
+                            ]);
+                          }).toList(),
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  String _getChestPainType(int? cp) {
+    switch (cp) {
+      case 1:
+        return 'Typical Angina';
+      case 2:
+        return 'Atypical Angina';
+      case 3:
+        return 'Non-anginal Pain';
+      case 4:
+        return 'Asymptomatic';
+      default:
+        return 'Unknown';
+    }
   }
 }

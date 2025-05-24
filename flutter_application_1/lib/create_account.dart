@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
+import 'auth_service.dart';
+import 'unverified_page.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -11,27 +13,34 @@ class CreateAccountPage extends StatefulWidget {
 class _CreateAccountPageState extends State<CreateAccountPage> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool _isLoading = false;
 
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final AuthService _authService = AuthService();
 
-  void _showAlert(String message) {
+  void _showAlert(String message, {bool isError = true}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: isError ? Colors.redAccent : Colors.green,
       ),
     );
   }
 
-  void _createAccount() {
+  Future<void> _createAccount() async {
+    final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
-    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       _showAlert("Silakan isi semua kolom yang tersedia.");
       return;
     }
@@ -41,21 +50,32 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       return;
     }
 
-    // Tampilkan pesan sukses
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Akun berhasil dibuat! Silakan login.'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    setState(() {
+      _isLoading = true;
+    });
 
-    // Kembali ke halaman utama
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const LandingPage(),
-      ),
-    );
+    try {
+      await _authService.register(name, email, password, confirmPassword);
+      _showAlert(
+          'Akun berhasil dibuat! Silakan cek Email untuk verifikasi akun.',
+          isError: false);
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const UnverifiedPage(),
+        ),
+      );
+    } catch (e) {
+      _showAlert(e.toString().replaceFirst("Exception: ", ""));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -84,9 +104,26 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 ),
                 const SizedBox(height: 24),
 
+                // Name
+                TextField(
+                  controller: _nameController,
+                  enabled: !_isLoading,
+                  decoration: InputDecoration(
+                    hintText: 'Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
                 // Email
                 TextField(
                   controller: _emailController,
+                  enabled: !_isLoading,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: 'Email address',
                     border: OutlineInputBorder(
@@ -101,6 +138,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 // Password
                 TextField(
                   controller: _passwordController,
+                  enabled: !_isLoading,
                   obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
                     hintText: 'Password',
@@ -115,11 +153,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             ? Icons.visibility
                             : Icons.visibility_off,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                     ),
                   ),
                 ),
@@ -128,6 +168,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 // Confirm Password
                 TextField(
                   controller: _confirmPasswordController,
+                  enabled: !_isLoading,
                   obscureText: !_isConfirmPasswordVisible,
                   decoration: InputDecoration(
                     hintText: 'Confirm password',
@@ -142,12 +183,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             ? Icons.visibility
                             : Icons.visibility_off,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isConfirmPasswordVisible =
-                              !_isConfirmPasswordVisible;
-                        });
-                      },
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              setState(() {
+                                _isConfirmPasswordVisible =
+                                    !_isConfirmPasswordVisible;
+                              });
+                            },
                     ),
                   ),
                 ),
@@ -163,40 +206,30 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      disabledBackgroundColor: Colors.grey,
                     ),
-                    onPressed: _createAccount,
-                    child: const Text(
-                      'Create account',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
+                    onPressed: _isLoading ? null : _createAccount,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 3,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Create account',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 24),
-// no text
-                const Text.rich(
-                  TextSpan(
-                    text: '',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.black54,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: '',
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      )
-                    ],
-                  ),
-                  textAlign: TextAlign.center,
-                ),
                 const SizedBox(height: 32),
               ],
             ),
