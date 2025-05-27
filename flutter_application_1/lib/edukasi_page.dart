@@ -62,7 +62,7 @@ class _EdukasiPageState extends State<EdukasiPage> {
             Container(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
               decoration: const BoxDecoration(
-                color: Colors.black,
+                color: Color(0xFF2D336B),
                 borderRadius:
                     BorderRadius.vertical(bottom: Radius.circular(20)),
               ),
@@ -84,7 +84,7 @@ class _EdukasiPageState extends State<EdukasiPage> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Color(0xFFD1834F),
+                          color: Color(0xFF7886C7),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(Icons.tune, color: Colors.white),
@@ -161,7 +161,7 @@ class _EdukasiPageState extends State<EdukasiPage> {
                                 const SizedBox(height: 10),
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.black,
+                                    backgroundColor: Color(0xFF2D336B),
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 14),
                                     shape: RoundedRectangleBorder(
@@ -230,7 +230,7 @@ class _EdukasiPageState extends State<EdukasiPage> {
                     padding: const EdgeInsets.all(12),
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.black,
+                      color: Color(0xFF2D336B),
                     ),
                     child: const Icon(Icons.arrow_back, color: Colors.white),
                   ),

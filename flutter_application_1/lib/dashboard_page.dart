@@ -58,7 +58,7 @@ class _DashboardPageState extends State<DashboardPage>
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: Colors.black,
+          color: Color(0xFF2D336B),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -106,19 +106,19 @@ class _DashboardHome extends StatelessWidget {
   List<Map<String, dynamic>> get edukasiList => [
         {
           'title': 'Pentingnya Olahraga bagi Penderita Penyakit Jantung:',
-          'color': const Color(0xFFD1834F),
+          'color': const Color(0xFF7886C7),
         },
         {
           'title': 'Jenis Olahraga yang Umumnya Aman dan Direkomendasikan:',
-          'color': const Color(0xFFEFD2BC),
+          'color': const Color(0xFF7886C7),
         },
         {
           'title': 'Hal yang Perlu Diperhatikan Sebelum dan Saat Berolahraga:',
-          'color': const Color(0xFFD0CBC7),
+          'color': const Color(0xFF7886C7),
         },
         {
           'title': 'Contoh Program Olahraga Ringan:',
-          'color': const Color(0xFFC0867D),
+          'color': const Color(0xFF7886C7),
         },
       ];
 
@@ -137,7 +137,7 @@ class _DashboardHome extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            color: Colors.black,
+            color: Color(0xFF2D336B),
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,7 +176,7 @@ class _DashboardHome extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         height: 48,
                         decoration: BoxDecoration(
-                          color: Colors.grey[900],
+                          color: Color(0xFF7886C7),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -203,7 +203,7 @@ class _DashboardHome extends StatelessWidget {
                       height: 48,
                       width: 48,
                       decoration: BoxDecoration(
-                        color: Colors.brown,
+                        color: Color(0xFF7886C7),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.tune, color: Colors.white),
@@ -375,7 +375,7 @@ class _DashboardHome extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.black,
+                                color: Color(0xFF7886C7),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Icon(

@@ -15,7 +15,7 @@ class EdukasiDetailJenisOlahragaPage extends StatelessWidget {
             // Header
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              color: Colors.black,
+              color: Color(0xFF2D336B),
               child: Row(
                 children: [
                   GestureDetector(
