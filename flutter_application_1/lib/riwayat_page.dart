@@ -158,16 +158,23 @@ class _RiwayatPageState extends State<RiwayatPage>
                             return DataRow(cells: [
                               DataCell(Text(riwayat['name'] ?? '')),
                               DataCell(Text('${riwayat['age'] ?? ''}')),
-                              DataCell(Text(riwayat['sex'] == 1
-                                  ? 'Laki-Laki'
-                                  : 'Wanita')),
+                              DataCell(Text(
+                                  (int.tryParse(riwayat['sex'].toString()) ??
+                                              0) ==
+                                          1
+                                      ? 'Laki-Laki'
+                                      : 'Wanita')),
                               DataCell(Text(_getChestPainType(riwayat['cp']))),
                               DataCell(
                                   Text('${riwayat['trestbps'] ?? ''} mmHg')),
                               DataCell(Text('${riwayat['chol'] ?? ''} mg/dL')),
                               DataCell(Text('${riwayat['thalach'] ?? ''} bpm')),
                               DataCell(Text(
-                                  riwayat['exang'] == 1 ? 'Iya' : 'Tidak')),
+                                  (int.tryParse(riwayat['exang'].toString()) ??
+                                              0) ==
+                                          1
+                                      ? 'Iya'
+                                      : 'Tidak')),
                               DataCell(
                                 Text(
                                   riwayat['hasil'] ?? '',
@@ -195,8 +202,9 @@ class _RiwayatPageState extends State<RiwayatPage>
     );
   }
 
-  String _getChestPainType(int? cp) {
-    switch (cp) {
+  String _getChestPainType(dynamic cp) {
+    int cpInt = int.tryParse(cp.toString()) ?? 0;
+    switch (cpInt) {
       case 1:
         return 'Typical Angina';
       case 2:
