@@ -92,7 +92,7 @@ class _RiwayatPageState extends State<RiwayatPage>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xFF7886C7),
         title: const Text(
           'Riwayat Klasifikasi',
           style: TextStyle(color: Colors.white),
