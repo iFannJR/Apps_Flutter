@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'main.dart';
 import 'auth_service.dart';
 import 'unverified_page.dart';
+import 'login_page.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -202,7 +203,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   height: 56,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: Color(0xFF7886C7),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -230,6 +231,38 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                // Add "Already have an account? Log in" link here
+                Center(
+                  child: GestureDetector(
+                    onTap: _isLoading
+                        ? null
+                        : () {
+                            // Disable saat loading
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginPage(),
+                              ),
+                            );
+                          },
+                    child: const Text.rich(
+                      TextSpan(
+                        text: "Already have an account? ",
+                        style: TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: "Log in",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.none,
+                              color: Color(0xFF2D336B), // Use appropriate color
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 32),
               ],
             ),

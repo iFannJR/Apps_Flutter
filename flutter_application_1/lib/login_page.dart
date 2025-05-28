@@ -188,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                               _rememberMe = value ?? false;
                             });
                           },
-                    activeColor: Colors.black,
+                    activeColor: Color(0xFF2D336B),
                   ),
                   const Text('Remember me'),
                 ],
@@ -199,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 56,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: Color(0xFF7886C7),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -246,14 +246,14 @@ class _LoginPageState extends State<LoginPage> {
                   child: const Text.rich(
                     TextSpan(
                       text: "Don't have an account? ",
-                      style: TextStyle(color: Colors.black54),
+                      style: TextStyle(color: Colors.black),
                       children: [
                         TextSpan(
                           text: "Sign up",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.none,
-                            color: Colors.black,
+                            color: Color(0xFF2D336B),
                           ),
                         ),
                       ],

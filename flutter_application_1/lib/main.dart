@@ -168,7 +168,7 @@ class LandingPage extends StatelessWidget {
                   height: 56,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: Color(0xFF7886C7),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -223,7 +223,7 @@ class LandingPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: Color(0xFF2D336B),
                       ),
                     ),
                   ),
