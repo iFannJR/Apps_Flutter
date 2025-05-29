@@ -162,23 +162,21 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
     }
   }
 
-  // Helper method to convert chest pain type to numeric value
   int _getChestPainTypeValue() {
     switch (_chestPainType) {
       case 'Typical Angina':
-        return 1;
-      case 'Atypical Angina':
-        return 2;
-      case 'Non-anginal Pain':
-        return 3;
-      case 'Asymptomatic':
-        return 4;
-      default:
         return 0;
+      case 'Atypical Angina':
+        return 1;
+      case 'Non-anginal Pain':
+        return 2;
+      case 'Asymptomatic':
+        return 3;
+      default:
+        return -1;
     }
   }
 
-  // Show result in a dialog
   void _showResultDialog(String result) {
     showDialog(
       context: context,
@@ -291,7 +289,7 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                       decoration:
                           const InputDecoration(labelText: 'Jenis Kelamin'),
                       value: _gender,
-                      items: ['Laki-Laki', 'Wanita'].map((String value) {
+                      items: ['Laki-Laki', 'Perempuan'].map((String value) {
                         return DropdownMenuItem<String>(
                             value: value, child: Text(value));
                       }).toList(),

@@ -163,7 +163,7 @@ class _RiwayatPageState extends State<RiwayatPage>
                                               0) ==
                                           1
                                       ? 'Laki-Laki'
-                                      : 'Wanita')),
+                                      : 'Perempuan')),
                               DataCell(Text(_getChestPainType(riwayat['cp']))),
                               DataCell(
                                   Text('${riwayat['trestbps'] ?? ''} mmHg')),
@@ -203,15 +203,15 @@ class _RiwayatPageState extends State<RiwayatPage>
   }
 
   String _getChestPainType(dynamic cp) {
-    int cpInt = int.tryParse(cp.toString()) ?? 0;
+    int cpInt = int.tryParse(cp.toString()) ?? -1;
     switch (cpInt) {
-      case 1:
+      case 0:
         return 'Typical Angina';
-      case 2:
+      case 1:
         return 'Atypical Angina';
-      case 3:
+      case 2:
         return 'Non-anginal Pain';
-      case 4:
+      case 3:
         return 'Asymptomatic';
       default:
         return 'Unknown';
