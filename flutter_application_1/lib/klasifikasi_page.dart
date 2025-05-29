@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'auth_service.dart';
 import 'login_page.dart';
+import 'custom_tooltip.dart';
 
 class KlasifikasiPage extends StatefulWidget {
   const KlasifikasiPage({super.key});
@@ -33,6 +34,36 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
 
   late AnimationController _animationController;
   late Animation<double> _fadeIn;
+
+  // Add the map declaration here, inside the class
+  final Map<String, String> _chestPainDescriptions = {
+    'Typical Angina':
+        'Nyeri dada yang terjadi ketika aktivitas fisik atau stres, biasanya hilang dengan istirahat.',
+    'Atypical Angina':
+        'Nyeri dada yang tidak mengikuti pola umum, bisa terjadi pada saat istirahat atau aktivitas ringan.',
+    'Non-anginal Pain':
+        'Nyeri dada yang tidak disebabkan oleh masalah jantung, tetapi bisa disebabkan oleh masalah lain seperti gangguan pencernaan atau kram otot.',
+    'Asymptomatic':
+        'Tidak ada gejala nyeri dada, namun tes medis menunjukkan adanya masalah pada jantung.',
+  };
+
+  // Add the method here, inside the class
+  Widget _buildInfoTooltip(String text) {
+    return Tooltip(
+      message: text,
+      triggerMode: TooltipTriggerMode.tap,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5),
+        ],
+      ),
+      textStyle: const TextStyle(color: Colors.black, fontSize: 12),
+      child: const Icon(Icons.help_outline, size: 18, color: Colors.grey),
+    );
+  }
 
   @override
   void initState() {
@@ -262,6 +293,7 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
                         }
                         return null;
                       },
+                      enabled: _userData == null,
                     ),
 
                     const SizedBox(height: 10),
@@ -304,19 +336,30 @@ class _KlasifikasiPageState extends State<KlasifikasiPage>
 
                     const SizedBox(height: 10),
 
-                    // Tipe Nyeri Dada
+                    // Tipe Nyeri Dada dengan tooltip
                     DropdownButtonFormField<String>(
-                      decoration:
-                          const InputDecoration(labelText: 'Tipe Nyeri Dada'),
+                      decoration: InputDecoration(
+                        labelText: 'Tipe Nyeri Dada',
+                        suffixIcon: _buildInfoTooltip(
+                          'Pilih tipe nyeri dada:\n\n'
+                          '• Typical Angina: Nyeri saat aktivitas\n'
+                          '• Atypical Angina: Nyeri tidak khas\n'
+                          '• Non-anginal: Bukan dari jantung\n'
+                          '• Asymptomatic: Tanpa gejala',
+                        ),
+                      ),
                       value: _chestPainType,
-                      items: [
-                        'Typical Angina',
-                        'Atypical Angina',
-                        'Non-anginal Pain',
-                        'Asymptomatic'
-                      ].map((String value) {
+                      items: _chestPainDescriptions.entries.map((entry) {
                         return DropdownMenuItem<String>(
-                            value: value, child: Text(value));
+                          value: entry.key,
+                          child: Row(
+                            children: [
+                              Text(entry.key),
+                              const SizedBox(width: 8),
+                              _buildInfoTooltip(entry.value),
+                            ],
+                          ),
+                        );
                       }).toList(),
                       onChanged: (val) => setState(() => _chestPainType = val),
                       validator: (value) {

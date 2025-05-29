@@ -19,19 +19,19 @@ class _EdukasiPageState extends State<EdukasiPage> {
   final List<Map<String, dynamic>> edukasiList = [
     {
       'title': 'Pentingnya Olahraga bagi Penderita Penyakit Jantung:',
-      'color': const Color(0xFFD1834F),
+      'color': Color(0xFF7886C7),
     },
     {
       'title': 'Jenis Olahraga yang Umumnya Aman dan Direkomendasikan:',
-      'color': const Color(0xFFEFD2BC),
+      'color': Color(0xFF7886C7),
     },
     {
       'title': 'Hal yang Perlu Diperhatikan Sebelum dan Saat Berolahraga:',
-      'color': const Color(0xFFD0CBC7),
+      'color': Color(0xFF7886C7),
     },
     {
       'title': 'Contoh Program Olahraga Ringan:',
-      'color': const Color(0xFFC0867D),
+      'color': Color(0xFF7886C7),
     },
   ];
 
