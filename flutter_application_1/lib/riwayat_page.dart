@@ -32,15 +32,18 @@ class _RiwayatPageState extends State<RiwayatPage>
       curve: Curves.easeIn,
     );
     _animationController.forward();
+
     _loadRiwayat();
   }
 
   Future<void> _loadRiwayat() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
     try {
       final token = await _authService.getToken();
-      if (token == null) {
-        throw Exception('Not authenticated');
-      }
+      if (token == null) throw Exception('Not authenticated');
 
       final userData = await _authService.getUserProfile();
       final userId = userData['id'];
@@ -51,9 +54,7 @@ class _RiwayatPageState extends State<RiwayatPage>
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: jsonEncode({
-          'user_id': userId,
-        }),
+        body: jsonEncode({'user_id': userId}),
       );
 
       if (response.statusCode == 200) {
@@ -81,10 +82,87 @@ class _RiwayatPageState extends State<RiwayatPage>
     }
   }
 
+  Future<void> _hapusRiwayat(String id) async {
+    // Konfirmasi penghapusan
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Konfirmasi Hapus'),
+        content: const Text('Apakah Anda yakin ingin menghapus riwayat ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+  //hapus riwayat
+    try {
+      final token = await _authService.getToken();
+      if (token == null) throw Exception('Not authenticated');
+
+      final deleteResponse = await http.delete(
+        Uri.parse('http://127.0.0.1:8000/api/riwayat/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (deleteResponse.statusCode == 200) {
+        final Map<String, dynamic> deleteData =
+            jsonDecode(deleteResponse.body);
+        if (deleteData['status'] == 'success') {
+          // Berhasil dihapus → reload
+          await _loadRiwayat();
+        } else {
+          throw Exception(deleteData['message'] ?? 'Failed to delete riwayat');
+        }
+      } else if (deleteResponse.statusCode == 401) {
+        throw Exception('Unauthorized');
+      } else {
+        final Map<String, dynamic> err = jsonDecode(deleteResponse.body);
+        throw Exception(err['message'] ?? 'Failed to delete riwayat');
+      }
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  String _getChestPainType(dynamic cp) {
+    int cpInt = int.tryParse(cp.toString()) ?? -1;
+    switch (cpInt) {
+      case 0:
+        return 'Typical Angina';
+      case 1:
+        return 'Atypical Angina';
+      case 2:
+        return 'Non-anginal Pain';
+      case 3:
+        return 'Asymptomatic';
+      default:
+        return 'Unknown';
+    }
   }
 
   @override
@@ -92,7 +170,7 @@ class _RiwayatPageState extends State<RiwayatPage>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xFF7886C7),
+        backgroundColor: const Color(0xFF7886C7),
         title: const Text(
           'Riwayat Klasifikasi',
           style: TextStyle(color: Colors.white),
@@ -139,58 +217,85 @@ class _RiwayatPageState extends State<RiwayatPage>
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(16),
                       ),
+                      // Scroll horizontal
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          columnSpacing: 24,
-                          columns: const [
-                            DataColumn(label: Text('Nama')),
-                            DataColumn(label: Text('Usia')),
-                            DataColumn(label: Text('Jenis Kelamin')),
-                            DataColumn(label: Text('Tipe Nyeri')),
-                            DataColumn(label: Text('Tekanan Darah')),
-                            DataColumn(label: Text('Kolesterol')),
-                            DataColumn(label: Text('Detak Jantung')),
-                            DataColumn(label: Text('Nyeri Olahraga')),
-                            DataColumn(label: Text('Hasil')),
-                          ],
-                          rows: _riwayatData.map((riwayat) {
-                            return DataRow(cells: [
-                              DataCell(Text(riwayat['name'] ?? '')),
-                              DataCell(Text('${riwayat['age'] ?? ''}')),
-                              DataCell(Text(
-                                  (int.tryParse(riwayat['sex'].toString()) ??
-                                              0) ==
-                                          1
-                                      ? 'Laki-Laki'
-                                      : 'Perempuan')),
-                              DataCell(Text(_getChestPainType(riwayat['cp']))),
-                              DataCell(
-                                  Text('${riwayat['trestbps'] ?? ''} mmHg')),
-                              DataCell(Text('${riwayat['chol'] ?? ''} mg/dL')),
-                              DataCell(Text('${riwayat['thalach'] ?? ''} bpm')),
-                              DataCell(Text(
-                                  (int.tryParse(riwayat['exang'].toString()) ??
-                                              0) ==
-                                          1
-                                      ? 'Iya'
-                                      : 'Tidak')),
-                              DataCell(
-                                Text(
-                                  riwayat['hasil'] ?? '',
-                                  style: TextStyle(
-                                    color: (riwayat['hasil'] ?? '')
-                                            .toLowerCase()
-                                            .contains('positif')
-                                        ? Colors.red
-                                        : Colors.green,
-                                    fontWeight: FontWeight.bold,
+                        child: 
+                          // Scroll vertical
+                          SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: DataTable(
+                              columnSpacing: 20,
+                              columns: const [
+                                DataColumn(label: Text('Nama')),
+                                DataColumn(label: Text('Usia')),
+                                DataColumn(label: Text('Jenis Kelamin')),
+                                DataColumn(label: Text('Tipe Nyeri')),
+                                DataColumn(label: Text('Tekanan Darah')),
+                                DataColumn(label: Text('Kolesterol')),
+                                DataColumn(label: Text('Detak Jantung')),
+                                DataColumn(label: Text('Nyeri Olahraga')),
+                                DataColumn(label: Text('Hasil')),
+                                DataColumn(label: Text('')), // Kolom untuk Delete
+                              ],
+                              rows: _riwayatData.map((riwayat) {
+                                // Ambil ID sebagai String
+                                final dynamic rawId = riwayat['id'];
+                                final String? id =
+                                    (rawId != null) ? rawId.toString() : null;
+
+                                return DataRow(cells: [
+                                  DataCell(Text(riwayat['name'] ?? '')),
+                                  DataCell(Text('${riwayat['age'] ?? ''}')),
+                                  DataCell(Text(
+                                    (int.tryParse(riwayat['sex'].toString()) ??
+                                                0) ==
+                                            1
+                                        ? 'Laki-Laki'
+                                        : 'Perempuan',
+                                  )),
+                                  DataCell(Text(_getChestPainType(riwayat['cp']))),
+                                  DataCell(
+                                      Text('${riwayat['trestbps'] ?? ''} mmHg')),
+                                  DataCell(Text('${riwayat['chol'] ?? ''} mg/dL')),
+                                  DataCell(Text('${riwayat['thalach'] ?? ''} bpm')),
+                                  DataCell(Text(
+                                    (int.tryParse(riwayat['exang'].toString()) ??
+                                                0) ==
+                                            1
+                                        ? 'Iya'
+                                        : 'Tidak',
+                                  )),
+                                  DataCell(
+                                    Text(
+                                      riwayat['hasil'] ?? '',
+                                      style: TextStyle(
+                                        color: (riwayat['hasil'] ?? '')
+                                                .toLowerCase()
+                                                .contains('positif')
+                                            ? Colors.red
+                                            : Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ]);
-                          }).toList(),
-                        ),
+                                  DataCell(
+                                    id != null
+                                        ? IconButton(
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              color: Colors.redAccent,
+                                            ),
+                                            onPressed: () {
+                                              _hapusRiwayat(id);
+                                            },
+                                          )
+                                        : const SizedBox.shrink(),
+                                  ),
+                                ]);
+                              }).toList(),
+                            ),
+                          ),
                       ),
                     ),
                   ),
@@ -200,21 +305,5 @@ class _RiwayatPageState extends State<RiwayatPage>
         ),
       ),
     );
-  }
-
-  String _getChestPainType(dynamic cp) {
-    int cpInt = int.tryParse(cp.toString()) ?? -1;
-    switch (cpInt) {
-      case 0:
-        return 'Typical Angina';
-      case 1:
-        return 'Atypical Angina';
-      case 2:
-        return 'Non-anginal Pain';
-      case 3:
-        return 'Asymptomatic';
-      default:
-        return 'Unknown';
-    }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'klasifikasi_page.dart';
 import 'edukasi_page.dart';
@@ -5,6 +7,8 @@ import 'riwayat_page.dart';
 import 'auth_service.dart';
 import 'main.dart';
 import 'dart:async';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:http/http.dart' as http;
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -408,7 +412,7 @@ class _DashboardHome extends StatelessWidget {
     );
   }
 }
-
+//widget grafik
 class _TimeWidget extends StatefulWidget {
   const _TimeWidget({super.key});
 
@@ -417,42 +421,63 @@ class _TimeWidget extends StatefulWidget {
 }
 
 class _TimeWidgetState extends State<_TimeWidget> {
-  late TimeOfDay _time;
-  late DateTime _dateTime;
-  Timer? _timer;
+  List<Map<String, dynamic>> _riwayatData = [];
+  bool _isLoadingRiwayat = true;
+  String? _errorRiwayat;
+  final _authService = AuthService();
 
   @override
   void initState() {
     super.initState();
-    _updateTime();
+    _loadRiwayatForChart();
   }
+  //pemanggilan data grafik
+  Future<void> _loadRiwayatForChart() async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) throw Exception('Not authenticated');
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
+      final userData = await _authService.getUserProfile();
+      final userId = userData['id'];
 
-  void _updateTime() {
-    setState(() {
-      _dateTime = DateTime.now();
-      _time = TimeOfDay.fromDateTime(_dateTime);
-    });
-    _timer = Timer(const Duration(seconds: 1), _updateTime);
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/api/riwayat'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'user_id': userId}),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> dataJson = jsonDecode(response.body);
+        if (dataJson['status'] == 'success') {
+          setState(() {
+            _riwayatData =
+                List<Map<String, dynamic>>.from(dataJson['riwayat']);
+            _isLoadingRiwayat = false;
+          });
+        } else {
+          throw Exception(dataJson['message'] ?? 'Gagal mengambil riwayat');
+        }
+      } else if (response.statusCode == 401) {
+        throw Exception('Unauthorized');
+      } else {
+        final Map<String, dynamic> err = jsonDecode(response.body);
+        throw Exception(err['message'] ?? 'Gagal mengambil riwayat');
+      }
+    } catch (e) {
+      setState(() {
+        _errorRiwayat = e.toString();
+        _isLoadingRiwayat = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final hour = _time.hour.toString().padLeft(2, '0');
-    final minute = _time.minute.toString().padLeft(2, '0');
-    final formattedDate =
-        "${_dateTime.day}/${_dateTime.month}/${_dateTime.year}";
-    final isMorning = _time.hour >= 5 && _time.hour <= 18;
-    final icon = isMorning ? Icons.wb_sunny_rounded : Icons.nights_stay_rounded;
-    final iconColor = isMorning ? Colors.orange : Colors.indigo;
-
     return Container(
-      height: 200,
+      // Container tanpa height statis supaya parent bisa scroll jika diperlukan
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -465,59 +490,139 @@ class _TimeWidgetState extends State<_TimeWidget> {
         ],
       ),
       padding: const EdgeInsets.all(20),
-      child: Row(
-        children: [
-          // Jam & Icon
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                child: Icon(
-                  icon,
-                  key: ValueKey(icon),
-                  size: 48,
-                  color: iconColor,
-                ),
-              ),
-              const SizedBox(height: 12),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                child: Text(
-                  "$hour:$minute",
-                  key: ValueKey("$hour:$minute"),
-                  style: const TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                formattedDate,
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            ],
-          ),
-          const SizedBox(width: 24),
-          // Teks motivasi
-          Expanded(
-            child: AnimatedOpacity(
-              opacity: 1,
-              duration: const Duration(milliseconds: 800),
-              child: Text(
-                "Selalu jaga kesehatan\njantung Anda <3 \n\nDan selalu berolahraga",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[800],
-                  height: 1.4,
-                ),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Riwayat Tekanan & Kolesterol',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D336B),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+
+            if (_isLoadingRiwayat)
+              const Center(child: CircularProgressIndicator())
+            else if (_errorRiwayat != null)
+              Text(
+                'Error chart: $_errorRiwayat',
+                style: const TextStyle(color: Colors.red),
+              )
+            else if (_riwayatData.isEmpty)
+              const Text('Belum ada data riwayat untuk chart')
+            else
+              Column(
+                children: [
+                  // Poin Penting: kita tetap beri BOUND HEIGHT via SizedBox
+                  SizedBox(
+                    height: 180, // Tinggi chart tetap (misal 180 piksel)
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: LineChart(
+                        LineChartData(
+                          // → Atur minY / maxY secara manual
+                          minY: 0,
+                          maxY: 250,
+                          // → Atur interval agar tick berurutan 0,50,100,150,200,250
+                          gridData: FlGridData(show: true),
+                          titlesData: FlTitlesData(
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 32,
+                                interval: 50, // setiap 50 unit ada label
+                                getTitlesWidget: (value, meta) {
+                                  return Text(
+                                    value.toInt().toString(), 
+                                    style: const TextStyle(fontSize: 10),
+                                  );
+                                },
+                              ),
+                            ),
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                interval: 1, // R1, R2, dst.
+                                getTitlesWidget: (value, meta) {
+                                  return Text(
+                                    'R${value.toInt() + 1}',
+                                    style: const TextStyle(fontSize: 10),
+                                  );
+                                },
+                              ),
+                            ),
+                            topTitles:
+                                AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            rightTitles:
+                                AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          ),
+                          lineBarsData: [
+                            _buildLineChartBar('trestbps', Colors.blue),
+                            _buildLineChartBar('chol', Colors.orange),
+                            _buildLineChartBar('thalach', Colors.green),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Legend(color: Colors.blue, text: 'Tekanan Darah'),
+                      SizedBox(width: 16),
+                      Legend(color: Colors.orange, text: 'Kolesterol'),
+                      SizedBox(width: 16),
+                      Legend(color: Colors.green, text: 'Detak Jantung'),
+                    ],
+                  ),
+                ],
+              ),
+          ],
+        ),
       ),
+    );
+  }
+  //implementasi line chart 
+  LineChartBarData _buildLineChartBar(String key, Color color) {
+    final spots = <FlSpot>[];
+    for (int i = 0; i < _riwayatData.length; i++) {
+      final yValue = double.tryParse(_riwayatData[i][key].toString()) ?? 0;
+      spots.add(FlSpot(i.toDouble(), yValue));
+    }
+    return LineChartBarData(
+      spots: spots,
+      isCurved: true,
+      barWidth: 2,
+      color: color,
+      dotData: FlDotData(show: false),
+      belowBarData: BarAreaData(show: false),
+    );
+  }
+}
+
+class Legend extends StatelessWidget {
+  final Color color;
+  final String text;
+
+  const Legend({required this.color, required this.text, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(width: 12, height: 12, color: color),
+        const SizedBox(width: 6),
+        Text(text),
+      ],
     );
   }
 }
