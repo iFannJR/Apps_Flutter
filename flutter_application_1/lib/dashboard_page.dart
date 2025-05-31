@@ -529,7 +529,7 @@ class _TimeWidgetState extends State<_TimeWidget> {
                         LineChartData(
                           // → Atur minY / maxY secara manual
                           minY: 0,
-                          maxY: 600,
+                          maxY: 500,
                           // → Atur interval agar tick berurutan 0,50,100,150,200,250
                           gridData: FlGridData(show: true),
                           titlesData: FlTitlesData(
@@ -537,7 +537,7 @@ class _TimeWidgetState extends State<_TimeWidget> {
                               sideTitles: SideTitles(
                                 showTitles: true,
                                 reservedSize: 32,
-                                interval: 100, // setiap 50 unit ada label
+                                interval: 50, // setiap 50 unit ada label
                                 getTitlesWidget: (value, meta) {
                                   return Text(
                                     value.toInt().toString(), 
